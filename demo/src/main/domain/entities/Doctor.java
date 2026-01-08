@@ -1,4 +1,4 @@
-package com.sghss.domain.entities;
+package com.sass.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

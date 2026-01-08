@@ -1,4 +1,4 @@
-package com.sghss.domain.enums;
+package com.sass.domain.enums;
 
 public enum AppointmentStatus {
     SCHEDULED,

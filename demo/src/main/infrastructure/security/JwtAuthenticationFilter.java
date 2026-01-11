@@ -59,4 +59,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        String path = request.getRequestURI();
+        // Pular filtro JWT para endpoints de autenticação
+        return path.startsWith("/api/auth/");
+    }
 }

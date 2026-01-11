@@ -9,10 +9,9 @@ CREATE TABLE users (
                        password VARCHAR(255) NOT NULL,
                        phone VARCHAR(15),
                        birth_date DATE,
-                       role VARCHAR(20) NOT NULL,
+                       role ENUM('PATIENT','DOCTOR','NURSE','ADMIN') NOT NULL,
                        active BOOLEAN DEFAULT TRUE,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       CONSTRAINT chk_role CHECK (role IN ('PATIENT', 'DOCTOR', 'NURSE', 'ADMIN'))
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Índices para users

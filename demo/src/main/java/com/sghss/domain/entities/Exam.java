@@ -51,6 +51,6 @@ public class Exam {
     private String result;
 
     @Lob
-    @Column(name = "file_data")
+    @Column(name = "file_data", columnDefinition = "LONGBLOB")
     private byte[] fileData;
 }

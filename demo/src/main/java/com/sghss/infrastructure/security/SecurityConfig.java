@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    // Note que o nome da variável é 'jwtAuthFilter'
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
@@ -32,14 +33,26 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                // 1. Libera Autenticação
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/error").permitAll()
+
+                // 2. Libera Swagger UI (Para os prints do TCC)
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                // 3. Libera acessos básicos para não dar erro 500 no navegador
+                .requestMatchers("/", "/error").permitAll()
+
+                // 4. Libera Console do H2 (se estiver usando)
+                .requestMatchers("/h2-console/**").permitAll()
+
+                // 5. Bloqueia o resto
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider())
+            // CORREÇÃO: Usando o nome correto da variável 'jwtAuthFilter'
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

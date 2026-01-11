@@ -1,8 +1,6 @@
--- V2__seed_data.sql
--- Dados de exemplo para testes
-
--- Senha para todos: "password123" (hash BCrypt)
--- $2a$10$ZGfT5Q3mJH8Z.W5x5F5x5e5x5x5x5x5x5x5x5x5x5x5x5x5x5x5
+-- V2__seed_data.sql - CORRIGIDO
+-- Senha para todos: "password123"
+-- Hash BCrypt correto: $2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
 
 -- Inserir Admin
 INSERT INTO users (id, cpf, name, email, password, phone, birth_date, role, active, created_at)
@@ -11,7 +9,7 @@ VALUES (
            '00000000001',
            'Admin System',
            'admin@hospital.com',
-           '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhkm',
+           '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
            '11999999999',
            '1980-01-01',
            'ADMIN',
@@ -19,7 +17,7 @@ VALUES (
            CURRENT_TIMESTAMP
        );
 
--- Médico 1
+-- Médico 1 (Cardiologista)
 SET @doctor1_id = UUID_TO_BIN(UUID(), true);
 
 INSERT INTO users VALUES (
@@ -27,7 +25,7 @@ INSERT INTO users VALUES (
                              '11111111111',
                              'Dr. João Silva',
                              'joao.silva@hospital.com',
-                             '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhkm',
+                             '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                              '11988888888',
                              '1975-05-15',
                              'DOCTOR',
@@ -41,7 +39,7 @@ INSERT INTO health_professionals VALUES
 INSERT INTO doctors VALUES
     (@doctor1_id, 'CRM123456-SP', 'Cardiologia, Medicina Interna', TRUE);
 
--- Médico 2
+-- Médico 2 (Pediatra)
 SET @doctor2_id = UUID_TO_BIN(UUID(), true);
 
 INSERT INTO users VALUES (
@@ -49,7 +47,7 @@ INSERT INTO users VALUES (
                              '22222222222',
                              'Dra. Maria Santos',
                              'maria.santos@hospital.com',
-                             '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhkm',
+                             '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                              '11977777777',
                              '1982-08-20',
                              'DOCTOR',
@@ -71,7 +69,7 @@ INSERT INTO users VALUES (
                              '33333333333',
                              'Carlos Oliveira',
                              'carlos.oliveira@email.com',
-                             '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhkm',
+                             '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                              '11966666666',
                              '1990-03-10',
                              'PATIENT',

@@ -88,15 +88,22 @@ public class AuthService {
         );
     }
 
-    public AuthResponse login(LoginRequest request) {
-        log.info("Authenticating user: {}", request.getEmail());
+public AuthResponse login(LoginRequest request) {
+    log.info("Tentando autenticar: {}", request.getEmail());
 
+    try {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
             )
         );
+    } catch (Exception e) {
+        log.error("Erro na autenticação: {}", e.getMessage());
+        throw e;
+    }
+
+    log.info("Autenticação bem-sucedida!");
 
         var user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new BusinessException("Invalid credentials"));

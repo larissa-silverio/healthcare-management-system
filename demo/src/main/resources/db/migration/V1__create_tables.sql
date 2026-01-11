@@ -64,17 +64,15 @@ CREATE TABLE appointments (
                               patient_id BINARY(16) NOT NULL,
                               doctor_id BINARY(16) NOT NULL,
                               appointment_date TIMESTAMP NOT NULL,
-                              type VARCHAR(20) NOT NULL,
-                              status VARCHAR(20) NOT NULL,
+                              type ENUM('IN_PERSON','TELEMEDICINE') NOT NULL,
+                              status ENUM('SCHEDULED','IN_PROGRESS','COMPLETED','CANCELLED') NOT NULL,
                               modality VARCHAR(50),
                               chief_complaint TEXT,
                               observations TEXT,
                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                               updated_at TIMESTAMP,
                               FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE RESTRICT,
-                              FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE RESTRICT,
-                              CONSTRAINT chk_type CHECK (type IN ('IN_PERSON', 'TELEMEDICINE')),
-                              CONSTRAINT chk_status CHECK (status IN ('SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'))
+                              FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE RESTRICT
 );
 
 -- Índices para appointments
@@ -135,15 +133,14 @@ CREATE TABLE exams (
                        requesting_doctor_id BINARY(16) NOT NULL,
                        medical_record_id BINARY(16),
                        type VARCHAR(100) NOT NULL,
-                       status VARCHAR(20) NOT NULL,
+                       status ENUM('REQUESTED','COMPLETED','CANCELLED') NOT NULL,
                        request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        completion_date TIMESTAMP,
                        result TEXT,
                        file_data LONGBLOB,
                        FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE RESTRICT,
                        FOREIGN KEY (requesting_doctor_id) REFERENCES doctors(id) ON DELETE RESTRICT,
-                       FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE SET NULL,
-                       CONSTRAINT chk_exam_status CHECK (status IN ('REQUESTED', 'COMPLETED', 'CANCELLED'))
+                       FOREIGN KEY (medical_record_id) REFERENCES medical_records(id) ON DELETE SET NULL
 );
 
 -- Índices para exams

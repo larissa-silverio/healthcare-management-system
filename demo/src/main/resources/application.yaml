@@ -20,7 +20,7 @@ spring:
     locations: classpath:db/migration
 
 jwt:
-  secret: ${JWT_SECRET:sua-chave-secreta-super-segura-com-256-bits-minimo}
+  secret: "3O5LwM7Yf3F+Qa8jXj3f7lVv3k1gUo7aQ2iE8mVdZjU="
   expiration: 86400000
 
 logging:

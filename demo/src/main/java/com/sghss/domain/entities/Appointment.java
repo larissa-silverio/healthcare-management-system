@@ -1,7 +1,7 @@
-package com.sass.domain.entities;
+package com.sghss.domain.entities;
 
-import com.sass.domain.enums.AppointmentStatus;
-import com.sass.domain.enums.AppointmentType;
+import com.sghss.domain.enums.AppointmentStatus;
+import com.sghss.domain.enums.AppointmentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

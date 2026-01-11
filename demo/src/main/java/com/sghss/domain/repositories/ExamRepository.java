@@ -1,8 +1,8 @@
-package com.sass.domain.repositories;
+package com.sghss.domain.repositories;
 
-import com.sass.domain.entities.Exam;
-import com.sass.domain.entities.Patient;
-import com.sass.domain.enums.ExamStatus;
+import com.sghss.domain.entities.Exam;
+import com.sghss.domain.entities.Patient;
+import com.sghss.domain.enums.ExamStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

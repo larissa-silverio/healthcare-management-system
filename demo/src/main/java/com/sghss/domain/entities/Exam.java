@@ -1,6 +1,6 @@
-package com.sass.domain.entities;
+package com.sghss.domain.entities;
 
-import com.sass.domain.enums.ExamStatus;
+import com.sghss.domain.enums.ExamStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

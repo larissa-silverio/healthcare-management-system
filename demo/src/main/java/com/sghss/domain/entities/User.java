@@ -1,6 +1,6 @@
-package com.sass.domain.entities;
+package com.sghss.domain.entities;
 
-import com.sass.domain.enums.UserRole;
+import com.sghss.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

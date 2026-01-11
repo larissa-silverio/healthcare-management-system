@@ -1,7 +1,7 @@
-package com.sass.domain.repositories;
+package com.sghss.domain.repositories;
 
-import com.sass.domain.entities.MedicalRecord;
-import com.sass.domain.entities.Patient;
+import com.sghss.domain.entities.MedicalRecord;
+import com.sghss.domain.entities.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -66,4 +66,37 @@ public class AppointmentController {
         appointmentService.cancelAppointment(id, reason);
         return ResponseEntity.noContent().build();
     }
+
+    // Endpoint para Finalizar Consulta
+    @PutMapping("/{id}/finish")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<Void> finishAppointment(
+        @PathVariable UUID id,
+        @Valid @RequestBody FinishAppointmentRequest request
+    ) {
+        appointmentService.finishAppointment(id, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // Endpoint para Adicionar Prescrição
+    @PostMapping("/{id}/prescriptions")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<Void> addPrescription(
+        @PathVariable UUID id,
+        @Valid @RequestBody PrescriptionRequest request
+    ) {
+        appointmentService.addPrescription(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // Endpoint para Solicitar Exame
+    @PostMapping("/{id}/exams")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<Void> requestExam(
+        @PathVariable UUID id,
+        @Valid @RequestBody ExamRequest request
+    ) {
+        appointmentService.requestExam(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }

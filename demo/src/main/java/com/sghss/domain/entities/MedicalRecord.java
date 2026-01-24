@@ -23,8 +23,8 @@ public class MedicalRecord {
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "patient_id", nullable = false, unique = true)
-    private Patient patient;
+    @JoinColumn(name = "appointment_id", nullable = false, unique = true)
+    private Appointment appointment;
 
     @OneToMany(mappedBy = "medicalRecord", cascade = CascadeType.ALL)
     private List<Prescription> prescriptions = new ArrayList<>();

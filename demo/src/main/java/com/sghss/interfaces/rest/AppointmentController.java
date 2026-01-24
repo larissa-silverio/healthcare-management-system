@@ -1,6 +1,9 @@
 package com.sghss.interfaces.rest;
 
 import com.sghss.application.dto.request.CreateAppointmentRequest;
+import com.sghss.application.dto.request.FinishAppointmentRequest;
+import com.sghss.application.dto.request.PrescriptionRequest;
+import com.sghss.application.dto.request.ExamRequest;
 import com.sghss.application.dto.response.AppointmentResponse;
 import com.sghss.application.services.AppointmentService;
 import jakarta.validation.Valid;
@@ -67,7 +70,6 @@ public class AppointmentController {
         return ResponseEntity.noContent().build();
     }
 
-    // Endpoint para Finalizar Consulta
     @PutMapping("/{id}/finish")
     @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<Void> finishAppointment(
@@ -78,7 +80,6 @@ public class AppointmentController {
         return ResponseEntity.ok().build();
     }
 
-    // Endpoint para Adicionar Prescrição
     @PostMapping("/{id}/prescriptions")
     @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<Void> addPrescription(
@@ -89,7 +90,6 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // Endpoint para Solicitar Exame
     @PostMapping("/{id}/exams")
     @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<Void> requestExam(

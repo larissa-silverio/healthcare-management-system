@@ -16,6 +16,13 @@ import com.sghss.patterns.factory.AppointmentFactory;
 import com.sghss.patterns.strategy.AppointmentStrategy;
 import com.sghss.patterns.strategy.InPersonAppointmentStrategy;
 import com.sghss.patterns.strategy.TelemedicineAppointmentStrategy;
+import com.sghss.application.dto.request.FinishAppointmentRequest;
+import com.sghss.application.dto.request.PrescriptionRequest;
+import com.sghss.application.dto.request.ExamRequest;
+import com.sghss.domain.entities.Prescription;
+import com.sghss.domain.entities.Exam;
+import com.sghss.domain.repositories.PrescriptionRepository;
+import com.sghss.domain.repositories.ExamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +43,8 @@ public class AppointmentService {
     private final AppointmentFactory appointmentFactory;
     private final InPersonAppointmentStrategy inPersonStrategy;
     private final TelemedicineAppointmentStrategy telemedicineStrategy;
+    private final PrescriptionRepository prescriptionRepository;
+    private final ExamRepository examRepository;
 
     @Transactional
     public AppointmentResponse createAppointment(CreateAppointmentRequest request) {
@@ -136,6 +145,42 @@ public class AppointmentService {
         log.info("Appointment cancelled successfully: {}", appointment.getProtocol());
     }
 
+    @Transactional
+    public void finishAppointment(UUID id, FinishAppointmentRequest request) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        appointment.setObservations(request.getDiagnosis() + " - " + request.getNotes());
+        appointmentRepository.save(appointment);
+    }
+
+    @Transactional
+    public void addPrescription(UUID id, PrescriptionRequest request) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
+
+        Prescription prescription = new Prescription();
+        prescription.setAppointment(appointment);
+        prescription.setNotes(request.getNotes()); // Agora o Java vai encontrar o setNotes
+        prescriptionRepository.save(prescription);
+    }
+
+    @Transactional
+    public void requestExam(UUID id, ExamRequest request) {
+        Appointment appointment = appointmentRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
+
+        Exam exam = new Exam();
+        exam.setAppointment(appointment);
+        exam.setName(request.getName());
+
+    // Ajuste aqui: Use o setResult para salvar o que vem do request.getObservations()
+        exam.setResult(request.getObservations());
+
+        exam.setStatus("REQUESTED");
+        examRepository.save(exam);
+    }
+
     private AppointmentStrategy getStrategy(AppointmentType type) {
         return switch (type) {
             case IN_PERSON -> inPersonStrategy;
@@ -158,7 +203,7 @@ public class AppointmentService {
         response.setObservations(appointment.getObservations());
 
         if (appointment.getType() == AppointmentType.TELEMEDICINE && appointment.getTelemedicineSession() != null) {
-        response.setSessionLink(appointment.getTelemedicineSession().getMeetingLink());
+        response.setSessionLink(appointment.getTelemedicineSession().getSessionLink());
         }
 
         return response;

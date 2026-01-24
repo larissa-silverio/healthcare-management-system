@@ -36,6 +36,12 @@ public class Exam {
     @ManyToOne
     @JoinColumn(name = "appointment_id", nullable = false)
     private Appointment appointment;
+    private String name;
+
+    @Column(name = "result")
+    private String result;   // REMOVA o campo 'observations' se ele existir aqui
+
+    private String status;
 
     @Column(nullable = false, length = 100)
     private String type;

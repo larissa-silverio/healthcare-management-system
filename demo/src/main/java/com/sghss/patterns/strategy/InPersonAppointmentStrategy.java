@@ -1,36 +1,31 @@
 package com.sghss.patterns.strategy;
 
 import com.sghss.domain.entities.Appointment;
-import com.sghss.domain.exceptions.BusinessException;
+import com.sghss.domain.entities.Doctor;
+import com.sghss.domain.entities.Patient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-/**
- * Estratégia para consultas presenciais
- */
-@Slf4j
 @Component
+@Slf4j
 public class InPersonAppointmentStrategy implements AppointmentStrategy {
 
     @Override
-    public void processAppointment(Appointment appointment) {
-        log.info("Processing in-person appointment: {}", appointment.getProtocol());
-
-        // Lógica específica para consultas presenciais
-        // Ex: verificar disponibilidade de sala, confirmar presença, etc.
-
-        log.info("In-person appointment processed successfully");
+    public void validateAppointment(Appointment appointment) {
+        log.info("Validating in-person appointment for patient {}", appointment.getPatient().getName());
+        // Lógica de validação específica para presencial
     }
 
     @Override
-    public void validateAppointment(Appointment appointment) {
-        log.info("Validating in-person appointment: {}", appointment.getProtocol());
+    public void processAppointment(Appointment appointment) {
+        // Método antigo mantido se necessário, ou redirecionando
+        schedule(appointment);
+    }
 
-        if (appointment.getModality() == null || appointment.getModality().isBlank()) {
-            throw new BusinessException("Modality is required for in-person appointments");
-        }
-
-        // Outras validações específicas
-        log.info("In-person appointment validated successfully");
+    @Override
+    public void schedule(Appointment appointment) {
+        log.info("Scheduling in-person appointment [Protocol: {}]", appointment.getProtocol());
+        appointment.setModality("Presencial - Consultório 3");
+        // Outras lógicas de agendamento presencial
     }
 }

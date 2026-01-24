@@ -1,14 +1,11 @@
 package com.sghss.domain.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +13,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class MedicalRecord {
 
     @Id
@@ -23,18 +21,16 @@ public class MedicalRecord {
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "appointment_id", nullable = false, unique = true)
-    private Appointment appointment;
-
-    @OneToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
-    @OneToMany(mappedBy = "medicalRecord", cascade = CascadeType.ALL)
-    private List<Prescription> prescriptions = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "appointment_id")
+    private Appointment appointment;
 
-    @OneToMany(mappedBy = "medicalRecord", cascade = CascadeType.ALL)
-    private List<Exam> exams = new ArrayList<>();
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "last_updated")

@@ -2,47 +2,38 @@ package com.sghss.patterns.strategy;
 
 import com.sghss.domain.entities.Appointment;
 import com.sghss.domain.entities.TelemedicineSession;
-import com.sghss.domain.exceptions.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-/**
- * Estratégia para teleconsultas
- */
-@Slf4j
+import java.util.UUID;
+
 @Component
+@Slf4j
 public class TelemedicineAppointmentStrategy implements AppointmentStrategy {
 
     @Override
-    public void processAppointment(Appointment appointment) {
-        log.info("Processing telemedicine appointment: {}", appointment.getProtocol());
-
-        // Lógica específica para teleconsultas
-        if (appointment.getTelemedicineSession() == null) {
-            // Criar sessão de telemedicina
-            TelemedicineSession session = new TelemedicineSession();
-            session.setAppointment(appointment);
-            session.setSessionLink(generateSessionLink());
-            appointment.setTelemedicineSession(session);
+    public void validateAppointment(Appointment appointment) {
+        log.info("Validating telemedicine appointment for protocol {}", appointment.getProtocol());
+        if (appointment.getDoctor() == null || !appointment.getDoctor().getActive()) {
+            throw new IllegalArgumentException("Doctor unavailable for telemedicine");
         }
-
-        log.info("Telemedicine appointment processed successfully");
     }
 
     @Override
-    public void validateAppointment(Appointment appointment) {
-        log.info("Validating telemedicine appointment: {}", appointment.getProtocol());
-
-        if (!appointment.getDoctor().getAcceptsTelemedicine()) {
-            throw new BusinessException("Doctor does not accept telemedicine appointments");
-        }
-
-        // Outras validações específicas
-        log.info("Telemedicine appointment validated successfully");
+    public void processAppointment(Appointment appointment) {
+        schedule(appointment);
     }
 
-    private String generateSessionLink() {
-        // Aqui seria integração com plataforma externa (Adapter)
-        return "https://meet.hospital.com/session-" + System.currentTimeMillis();
+    @Override
+    public void schedule(Appointment appointment) {
+        log.info("Scheduling telemedicine appointment [Protocol: {}]", appointment.getProtocol());
+
+        // Gera o link da sessão
+        TelemedicineSession session = new TelemedicineSession();
+        session.setAppointment(appointment);
+        session.setSessionLink("https://meet.hospital.com/" + UUID.randomUUID());
+
+        appointment.setTelemedicineSession(session);
+        appointment.setModality("Online - Google Meet");
     }
 }

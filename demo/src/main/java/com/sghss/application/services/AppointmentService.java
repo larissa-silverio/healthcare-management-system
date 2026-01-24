@@ -1,28 +1,17 @@
 package com.sghss.application.services;
 
-import com.sghss.application.dto.request.CreateAppointmentRequest;
+import com.sghss.application.dto.request.*;
 import com.sghss.application.dto.response.AppointmentResponse;
-import com.sghss.domain.entities.Appointment;
-import com.sghss.domain.entities.Doctor;
-import com.sghss.domain.entities.Patient;
+import com.sghss.domain.entities.*;
 import com.sghss.domain.enums.AppointmentStatus;
 import com.sghss.domain.enums.AppointmentType;
 import com.sghss.domain.exceptions.BusinessException;
 import com.sghss.domain.exceptions.ResourceNotFoundException;
-import com.sghss.domain.repositories.AppointmentRepository;
-import com.sghss.domain.repositories.DoctorRepository;
-import com.sghss.domain.repositories.PatientRepository;
+import com.sghss.domain.repositories.*;
 import com.sghss.patterns.factory.AppointmentFactory;
 import com.sghss.patterns.strategy.AppointmentStrategy;
 import com.sghss.patterns.strategy.InPersonAppointmentStrategy;
 import com.sghss.patterns.strategy.TelemedicineAppointmentStrategy;
-import com.sghss.application.dto.request.FinishAppointmentRequest;
-import com.sghss.application.dto.request.PrescriptionRequest;
-import com.sghss.application.dto.request.ExamRequest;
-import com.sghss.domain.entities.Prescription;
-import com.sghss.domain.entities.Exam;
-import com.sghss.domain.repositories.PrescriptionRepository;
-import com.sghss.domain.repositories.ExamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,104 +33,62 @@ public class AppointmentService {
     private final TelemedicineAppointmentStrategy telemedicineStrategy;
     private final PrescriptionRepository prescriptionRepository;
     private final ExamRepository examRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
 
     @Transactional
     public AppointmentResponse createAppointment(CreateAppointmentRequest request) {
         log.info("Creating appointment for patient ID: {}", request.getPatientId());
 
-        // Buscar paciente e médico
         Patient patient = patientRepository.findById(request.getPatientId())
             .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", request.getPatientId()));
 
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
             .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", request.getDoctorId()));
 
-        // Usar Factory para criar consulta
         Appointment appointment = appointmentFactory.createAppointment(request, patient, doctor);
 
-        // Usar Strategy para processar e validar
         AppointmentStrategy strategy = getStrategy(appointment.getType());
-        strategy.validateAppointment(appointment);
-        strategy.processAppointment(appointment);
+        strategy.schedule(appointment);
 
-        // Salvar
         Appointment savedAppointment = appointmentRepository.save(appointment);
-
-        log.info("Appointment created successfully: {}", savedAppointment.getProtocol());
+        log.info("Appointment created: {}", savedAppointment.getProtocol());
 
         return mapToResponse(savedAppointment);
     }
 
     @Transactional(readOnly = true)
     public AppointmentResponse getById(UUID id) {
-        log.info("Getting appointment by ID: {}", id);
-
-        Appointment appointment = appointmentRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
-
-        return mapToResponse(appointment);
+        return mapToResponse(appointmentRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id)));
     }
 
     @Transactional(readOnly = true)
     public AppointmentResponse getByProtocol(String protocol) {
-        log.info("Getting appointment by protocol: {}", protocol);
-
-        Appointment appointment = appointmentRepository.findByProtocol(protocol)
-            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "protocol", protocol));
-
-        return mapToResponse(appointment);
+        return mapToResponse(appointmentRepository.findByProtocol(protocol)
+            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "protocol", protocol)));
     }
 
     @Transactional(readOnly = true)
     public List<AppointmentResponse> getByPatientId(UUID patientId) {
-        log.info("Getting appointments for patient ID: {}", patientId);
-
         Patient patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", patientId));
-
-        return appointmentRepository.findByPatient(patient)
-            .stream()
-            .map(this::mapToResponse)
-            .collect(Collectors.toList());
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", patientId));
+        return appointmentRepository.findByPatient(patient).stream().map(this::mapToResponse).toList();
     }
 
     @Transactional(readOnly = true)
     public List<AppointmentResponse> getByDoctorId(UUID doctorId) {
-        log.info("Getting appointments for doctor ID: {}", doctorId);
-
         Doctor doctor = doctorRepository.findById(doctorId)
-            .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
-
-        return appointmentRepository.findByDoctor(doctor)
-            .stream()
-            .map(this::mapToResponse)
-            .collect(Collectors.toList());
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));
+        return appointmentRepository.findByDoctor(doctor).stream().map(this::mapToResponse).toList();
     }
 
     @Transactional
     public void cancelAppointment(UUID id, String reason) {
-        log.info("Cancelling appointment ID: {}", id);
-
         Appointment appointment = appointmentRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
-
-        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new BusinessException("Cannot cancel a completed appointment");
-        }
-
-        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
-            throw new BusinessException("Appointment is already cancelled");
-        }
-
         appointment.setStatus(AppointmentStatus.CANCELLED);
-        appointment.setObservations(
-            (appointment.getObservations() != null ? appointment.getObservations() + "\n" : "") +
-            "Cancelled: " + reason
-        );
-
+        appointment.setObservations("Motivo cancelamento: " + reason);
         appointmentRepository.save(appointment);
-
-        log.info("Appointment cancelled successfully: {}", appointment.getProtocol());
     }
 
     @Transactional
@@ -152,6 +98,17 @@ public class AppointmentService {
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointment.setObservations(request.getDiagnosis() + " - " + request.getNotes());
         appointmentRepository.save(appointment);
+
+        // CORREÇÃO: Usando construtor vazio e setters para evitar erro de argumentos
+        MedicalRecord record = medicalRecordRepository.findByPatient(appointment.getPatient())
+                .orElseGet(() -> {
+                    MedicalRecord newRecord = new MedicalRecord();
+                    newRecord.setPatient(appointment.getPatient());
+                    newRecord.setAppointment(appointment); // Vincula à consulta atual
+                    return newRecord;
+                });
+
+        medicalRecordRepository.save(record);
     }
 
     @Transactional
@@ -161,31 +118,25 @@ public class AppointmentService {
 
         Prescription prescription = new Prescription();
         prescription.setAppointment(appointment);
-        prescription.setNotes(request.getNotes()); // Agora o Java vai encontrar o setNotes
+        prescription.setNotes(request.getNotes());
         prescriptionRepository.save(prescription);
     }
 
     @Transactional
     public void requestExam(UUID id, ExamRequest request) {
         Appointment appointment = appointmentRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
 
         Exam exam = new Exam();
         exam.setAppointment(appointment);
         exam.setName(request.getName());
-
-    // Ajuste aqui: Use o setResult para salvar o que vem do request.getObservations()
         exam.setResult(request.getObservations());
-
         exam.setStatus("REQUESTED");
         examRepository.save(exam);
     }
 
     private AppointmentStrategy getStrategy(AppointmentType type) {
-        return switch (type) {
-            case IN_PERSON -> inPersonStrategy;
-            case TELEMEDICINE -> telemedicineStrategy;
-        };
+        return type == AppointmentType.TELEMEDICINE ? telemedicineStrategy : inPersonStrategy;
     }
 
     private AppointmentResponse mapToResponse(Appointment appointment) {
@@ -202,10 +153,9 @@ public class AppointmentService {
         response.setChiefComplaint(appointment.getChiefComplaint());
         response.setObservations(appointment.getObservations());
 
-        if (appointment.getType() == AppointmentType.TELEMEDICINE && appointment.getTelemedicineSession() != null) {
-        response.setSessionLink(appointment.getTelemedicineSession().getSessionLink());
+        if (appointment.getTelemedicineSession() != null) {
+            response.setSessionLink(appointment.getTelemedicineSession().getSessionLink());
         }
-
         return response;
     }
 }

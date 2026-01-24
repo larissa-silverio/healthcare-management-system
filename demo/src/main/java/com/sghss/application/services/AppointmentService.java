@@ -157,8 +157,8 @@ public class AppointmentService {
         response.setChiefComplaint(appointment.getChiefComplaint());
         response.setObservations(appointment.getObservations());
 
-        if (appointment.getTelemedicineSession() != null) {
-            response.setSessionLink(appointment.getTelemedicineSession().getSessionLink());
+        if (appointment.getType() == AppointmentType.TELEMEDICINE && appointment.getTelemedicineSession() != null) {
+        response.setSessionLink(appointment.getTelemedicineSession().getMeetingLink());
         }
 
         return response;

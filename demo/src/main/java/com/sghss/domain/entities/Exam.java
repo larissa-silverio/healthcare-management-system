@@ -33,6 +33,10 @@ public class Exam {
     @JoinColumn(name = "medical_record_id")
     private MedicalRecord medicalRecord;
 
+    @ManyToOne
+    @JoinColumn(name = "appointment_id", nullable = false)
+    private Appointment appointment;
+
     @Column(nullable = false, length = 100)
     private String type;
 

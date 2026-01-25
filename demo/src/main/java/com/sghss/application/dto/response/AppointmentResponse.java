@@ -25,5 +25,5 @@ public class AppointmentResponse {
     private AppointmentStatus status;
     private String chiefComplaint;
     private String observations;
-    private String sessionLink; // Para telemedicina
+    private String sessionLink;
 }

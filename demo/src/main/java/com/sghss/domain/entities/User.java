@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@Data // Gera Getters, Setters, ToString, etc.
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -34,7 +34,7 @@ public abstract class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    private Boolean active = true; // Garante que getActive() funcione
+    private Boolean active = true;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

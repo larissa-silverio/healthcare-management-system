@@ -1,5 +1,7 @@
+
 package com.sghss.domain.entities;
 
+import com.sghss.domain.enums.ExamStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
@@ -21,9 +23,10 @@ public class Exam {
 
     private String name;
 
-    // Corrigido: Campos definidos apenas uma vez
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "VARCHAR(20)")
+    private ExamStatus status;
 
-    @Column(name = "result")
+    @Column(name = "result", columnDefinition = "TEXT")
     private String result;
 }

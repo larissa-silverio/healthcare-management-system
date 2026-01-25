@@ -32,7 +32,7 @@ public class TelemedicineSession {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
-    @Column(name = "duration") // Em minutos
+    @Column(name = "duration")
     private Integer duration;
 
     @Column(name = "recording_url", length = 500)

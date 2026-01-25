@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public abstract class HealthProfessional extends User {
 
     @Column(nullable = false, unique = true, length = 20)
-    private String registrationNumber; // CRM, COREN, etc
+    private String registrationNumber;
 
     @Column(length = 100)
     private String specialty;

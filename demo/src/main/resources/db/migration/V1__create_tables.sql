@@ -1,5 +1,3 @@
--- V1__create_tables.sql - VERSÃO FINAL COM TODAS AS COLUNAS
-
 CREATE TABLE users (
                        id BINARY(16) PRIMARY KEY,
                        cpf VARCHAR(11) UNIQUE,
@@ -57,22 +55,42 @@ CREATE TABLE appointments (
                               FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE telemedicine_sessions (
-                                       id BINARY(16) PRIMARY KEY,
-                                       appointment_id BINARY(16) UNIQUE NOT NULL,
-                                       session_link VARCHAR(500),
-                                       FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
+CREATE TABLE medical_records (
+                                 id BINARY(16) PRIMARY KEY,
+                                 patient_id BINARY(16) NOT NULL,
+                                 appointment_id BINARY(16),
+                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 last_updated TIMESTAMP,
+                                 FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+                                 FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL
 );
 
 CREATE TABLE prescriptions (
                                id BINARY(16) PRIMARY KEY,
                                appointment_id BINARY(16) NOT NULL,
+                               doctor_id BINARY(16) NOT NULL,
+                               patient_id BINARY(16) NOT NULL,
+                               medical_record_id BINARY(16),
                                notes TEXT,
-                               digital_signature TEXT, -- COLUNA ADICIONADA AQUI
+                               digital_signature TEXT,
                                date_issued TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                               FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
+                               validity DATE,
+                               FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE,
+                               FOREIGN KEY (doctor_id) REFERENCES doctors(id),
+                               FOREIGN KEY (patient_id) REFERENCES patients(id),
+                               FOREIGN KEY (medical_record_id) REFERENCES medical_records(id)
 );
 
+CREATE TABLE telemedicine_sessions (
+                                       id BINARY(16) PRIMARY KEY,
+                                       appointment_id BINARY(16) UNIQUE NOT NULL,
+                                       session_link VARCHAR(500),
+                                       start_time TIMESTAMP NULL,
+                                       end_time TIMESTAMP NULL,
+                                       duration INT,
+                                       recording_url VARCHAR(500),
+                                       FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
+);
 CREATE TABLE medications (
                              id BINARY(16) PRIMARY KEY,
                              prescription_id BINARY(16) NOT NULL,
@@ -93,15 +111,6 @@ CREATE TABLE exams (
                        FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE CASCADE
 );
 
-CREATE TABLE medical_records (
-                                 id BINARY(16) PRIMARY KEY,
-                                 patient_id BINARY(16) NOT NULL,
-                                 appointment_id BINARY(16),
-                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                 last_updated TIMESTAMP,
-                                 FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
-                                 FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL
-);
 
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_appointments_date ON appointments(appointment_date);

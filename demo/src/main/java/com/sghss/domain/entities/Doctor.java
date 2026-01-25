@@ -21,7 +21,7 @@ public class Doctor extends HealthProfessional {
     private String crm;
 
     @Column(name = "specialties", columnDefinition = "TEXT")
-    private String specialties; // Pode ser JSON array
+    private String specialties;
 
     @Column(name = "accepts_telemedicine")
     private Boolean acceptsTelemedicine = false;

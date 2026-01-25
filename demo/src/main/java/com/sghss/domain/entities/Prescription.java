@@ -26,8 +26,6 @@ public class Prescription {
     @ManyToOne
     @JoinColumn(name = "appointment_id", nullable = false)
     private Appointment appointment;
-    private String notes;
-    private LocalDateTime dateIssued;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
@@ -44,13 +42,14 @@ public class Prescription {
     @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Medication> medications = new ArrayList<>();
 
-    @CreationTimestamp
-    @Column(name = "issue_date", nullable = false, updatable = false)
-    private LocalDateTime issueDate;
+    private String notes;
 
-    @Column(name = "validity")
+    @CreationTimestamp
+    @Column(name = "date_issued", nullable = false, updatable = false)
+    private LocalDateTime dateIssued;
+
     private LocalDate validity;
 
-    @Column(name = "digital_signature", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String digitalSignature;
 }

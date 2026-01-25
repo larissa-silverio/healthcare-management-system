@@ -111,33 +111,33 @@ public class AppointmentService {
         medicalRecordRepository.save(record);
     }
 
-// Arquivo: src/main/java/com/sghss/application/services/AppointmentService.java
+    @Transactional
+    public void addPrescription(UUID id, PrescriptionRequest request) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
 
-@Transactional
-public void addPrescription(UUID id, PrescriptionRequest request) {
-    Appointment appointment = appointmentRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
+        Prescription prescription = new Prescription();
+        prescription.setAppointment(appointment);
+        prescription.setPatient(appointment.getPatient());
+        prescription.setDoctor(appointment.getDoctor());
+        prescription.setNotes(request.getNotes());
 
-    Prescription prescription = new Prescription();
-    prescription.setAppointment(appointment);
-    prescription.setPatient(appointment.getPatient()); // Define o paciente da consulta
-    prescription.setDoctor(appointment.getDoctor());   // Define o médico da consulta
-    prescription.setNotes(request.getNotes());
+        if (request.getMedications() != null) {
+            List<Medication> medications = request.getMedications().stream().map(medReq -> {
+                Medication medication = new Medication();
+                medication.setName(medReq.getName());
+                medication.setDosage(medReq.getDosage());
+                medication.setObservations(medReq.getInstructions());
+                medication.setPrescription(prescription);
+                return medication;
+            }).toList();
+            prescription.getMedications().addAll(medications);
+        }
 
-    if (request.getMedications() != null) {
-        List<Medication> medications = request.getMedications().stream().map(medReq -> {
-            Medication medication = new Medication();
-            medication.setName(medReq.getName());
-            medication.setDosage(medReq.getDosage());
-            medication.setObservations(medReq.getInstructions()); // Mapeia instruções
-            medication.setPrescription(prescription);
-            return medication;
-        }).toList();
-        prescription.getMedications().addAll(medications);
+        prescriptionRepository.save(prescription);
     }
 
-    prescriptionRepository.save(prescription);
-}
+
     @Transactional
     public void requestExam(UUID id, ExamRequest request) {
         Appointment appointment = appointmentRepository.findById(id)

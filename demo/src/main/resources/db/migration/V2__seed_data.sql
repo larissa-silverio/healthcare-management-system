@@ -1,7 +1,3 @@
--- V2__seed_data.sql - CORRIGIDO E ALINHADO COM V1
-
--- 1. Inserir Admin
--- Explícito nas colunas para evitar erro de contagem
 INSERT INTO users (id, cpf, name, email, password, phone, birth_date, role, active, created_at)
 VALUES (
            UUID_TO_BIN(UUID(), true),
@@ -16,7 +12,7 @@ VALUES (
            CURRENT_TIMESTAMP
        );
 
--- 2. Médico 1 (Cardiologista)
+
 SET @doctor1_id = UUID_TO_BIN(UUID(), true);
 
 INSERT INTO users (id, cpf, name, email, password, phone, birth_date, role, active, created_at)
@@ -39,7 +35,6 @@ VALUES (@doctor1_id, 'CRM123456', 'Cardiologia', 'Unidade Central');
 INSERT INTO doctors (id, crm, specialties, accepts_telemedicine)
 VALUES (@doctor1_id, 'CRM123456-SP', 'Cardiologia, Medicina Interna', TRUE);
 
--- 3. Médico 2 (Pediatra)
 SET @doctor2_id = UUID_TO_BIN(UUID(), true);
 
 INSERT INTO users (id, cpf, name, email, password, phone, birth_date, role, active, created_at)
@@ -62,7 +57,6 @@ VALUES (@doctor2_id, 'CRM789012', 'Pediatria', 'Unidade Infantil');
 INSERT INTO doctors (id, crm, specialties, accepts_telemedicine)
 VALUES (@doctor2_id, 'CRM789012-SP', 'Pediatria', FALSE);
 
--- 4. Paciente
 SET @patient1_id = UUID_TO_BIN(UUID(), true);
 
 INSERT INTO users (id, cpf, name, email, password, phone, birth_date, role, active, created_at)
@@ -90,8 +84,7 @@ VALUES (
            'Ana Oliveira - 11955555555'
        );
 
--- 5. Prontuário Médico (A CORREÇÃO PRINCIPAL ESTÁ AQUI)
--- Agora especificamos as colunas para bater com a tabela nova que tem 5 campos
+
 INSERT INTO medical_records (id, patient_id, last_updated)
 VALUES (
            UUID_TO_BIN(UUID(), true),

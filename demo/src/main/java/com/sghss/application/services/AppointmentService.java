@@ -4,6 +4,7 @@ import com.sghss.application.dto.request.*;
 import com.sghss.application.dto.response.AppointmentResponse;
 import com.sghss.domain.entities.*;
 import com.sghss.domain.enums.AppointmentStatus;
+import com.sghss.domain.enums.ExamStatus;
 import com.sghss.domain.enums.AppointmentType;
 import com.sghss.domain.exceptions.BusinessException;
 import com.sghss.domain.exceptions.ResourceNotFoundException;
@@ -99,29 +100,44 @@ public class AppointmentService {
         appointment.setObservations(request.getDiagnosis() + " - " + request.getNotes());
         appointmentRepository.save(appointment);
 
-        // CORREÇÃO: Usando construtor vazio e setters para evitar erro de argumentos
         MedicalRecord record = medicalRecordRepository.findByPatient(appointment.getPatient())
                 .orElseGet(() -> {
                     MedicalRecord newRecord = new MedicalRecord();
                     newRecord.setPatient(appointment.getPatient());
-                    newRecord.setAppointment(appointment); // Vincula à consulta atual
+                    newRecord.setAppointment(appointment);
                     return newRecord;
                 });
 
         medicalRecordRepository.save(record);
     }
 
-    @Transactional
-    public void addPrescription(UUID id, PrescriptionRequest request) {
-        Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
+// Arquivo: src/main/java/com/sghss/application/services/AppointmentService.java
 
-        Prescription prescription = new Prescription();
-        prescription.setAppointment(appointment);
-        prescription.setNotes(request.getNotes());
-        prescriptionRepository.save(prescription);
+@Transactional
+public void addPrescription(UUID id, PrescriptionRequest request) {
+    Appointment appointment = appointmentRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", id));
+
+    Prescription prescription = new Prescription();
+    prescription.setAppointment(appointment);
+    prescription.setPatient(appointment.getPatient()); // Define o paciente da consulta
+    prescription.setDoctor(appointment.getDoctor());   // Define o médico da consulta
+    prescription.setNotes(request.getNotes());
+
+    if (request.getMedications() != null) {
+        List<Medication> medications = request.getMedications().stream().map(medReq -> {
+            Medication medication = new Medication();
+            medication.setName(medReq.getName());
+            medication.setDosage(medReq.getDosage());
+            medication.setObservations(medReq.getInstructions()); // Mapeia instruções
+            medication.setPrescription(prescription);
+            return medication;
+        }).toList();
+        prescription.getMedications().addAll(medications);
     }
 
+    prescriptionRepository.save(prescription);
+}
     @Transactional
     public void requestExam(UUID id, ExamRequest request) {
         Appointment appointment = appointmentRepository.findById(id)
@@ -131,7 +147,7 @@ public class AppointmentService {
         exam.setAppointment(appointment);
         exam.setName(request.getName());
         exam.setResult(request.getObservations());
-        exam.setStatus("REQUESTED");
+        exam.setStatus(ExamStatus.REQUESTED);
         examRepository.save(exam);
     }
 

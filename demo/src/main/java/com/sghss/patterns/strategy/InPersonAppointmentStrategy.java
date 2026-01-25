@@ -13,12 +13,11 @@ public class InPersonAppointmentStrategy implements AppointmentStrategy {
     @Override
     public void validateAppointment(Appointment appointment) {
         log.info("Validating in-person appointment for patient {}", appointment.getPatient().getName());
-        // Lógica de validação específica para presencial
+
     }
 
     @Override
     public void processAppointment(Appointment appointment) {
-        // Método antigo mantido se necessário, ou redirecionando
         schedule(appointment);
     }
 
@@ -26,6 +25,6 @@ public class InPersonAppointmentStrategy implements AppointmentStrategy {
     public void schedule(Appointment appointment) {
         log.info("Scheduling in-person appointment [Protocol: {}]", appointment.getProtocol());
         appointment.setModality("Presencial - Consultório 3");
-        // Outras lógicas de agendamento presencial
+
     }
 }

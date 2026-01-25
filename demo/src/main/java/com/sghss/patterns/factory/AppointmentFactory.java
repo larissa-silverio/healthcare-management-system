@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j // Adicionado
+@Slf4j
 public class AppointmentFactory {
 
     public Appointment createAppointment(CreateAppointmentRequest request, Patient patient, Doctor doctor) {
@@ -23,9 +23,6 @@ public class AppointmentFactory {
         appointment.setStatus(AppointmentStatus.SCHEDULED);
         appointment.setChiefComplaint(request.getChiefComplaint());
         appointment.setObservations(request.getObservations());
-
-        // Se modality for usado para algo específico, configure aqui
-        // appointment.setModality(request.getModality());
 
         return appointment;
     }

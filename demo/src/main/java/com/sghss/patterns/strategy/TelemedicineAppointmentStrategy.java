@@ -28,7 +28,6 @@ public class TelemedicineAppointmentStrategy implements AppointmentStrategy {
     public void schedule(Appointment appointment) {
         log.info("Scheduling telemedicine appointment [Protocol: {}]", appointment.getProtocol());
 
-        // Gera o link da sessão
         TelemedicineSession session = new TelemedicineSession();
         session.setAppointment(appointment);
         session.setSessionLink("https://meet.hospital.com/" + UUID.randomUUID());

@@ -23,6 +23,6 @@ public class CreateAppointmentRequest {
     private String chiefComplaint;
     private String observations;
 
-    // Campo adicionado para corrigir erro na Factory
+
     private String modality;
 }

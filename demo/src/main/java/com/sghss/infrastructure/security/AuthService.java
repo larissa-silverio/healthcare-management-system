@@ -38,7 +38,6 @@ public class AuthService {
     public AuthResponse registerPatient(RegisterPatientRequest request) {
         log.info("Registering new patient: {}", request.getEmail());
 
-        // Validações
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email already exists");
         }
@@ -51,7 +50,6 @@ public class AuthService {
             throw new BusinessException("SUS card already exists");
         }
 
-        // Criar paciente
         Patient patient = new Patient();
         patient.setCpf(request.getCpf());
         patient.setName(request.getName());
@@ -69,12 +67,11 @@ public class AuthService {
 
         Patient savedPatient = patientRepository.save(patient);
 
-        // Criar prontuário
         MedicalRecord medicalRecord = new MedicalRecord();
         medicalRecord.setPatient(savedPatient);
         medicalRecordRepository.save(medicalRecord);
 
-        // Gerar token
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(patient.getEmail());
         String token = jwtService.generateToken(userDetails);
 

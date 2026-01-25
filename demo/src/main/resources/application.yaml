@@ -1,6 +1,9 @@
 spring:
   application:
     name: sghss
+  mvc:
+    problemdetails:
+      enabled: true
 
   profiles:
     active: dev

@@ -8,13 +8,11 @@ Maven 3.8+ (ou utilizar o wrapper incluso)
 MySQL 8.0
 
 🗄️ Configuração do Banco de Dados
-Acesse seu terminal MySQL e crie o esquema:
-
-```CREATE DATABASE sghss_dev;```
 
 As tabelas e dados iniciais são gerenciados automaticamente pelo Flyway na inicialização.
 
 O script de estrutura localiza-se em: ```src/main/resources/db/migration/V1__create_tables.sql```
+
 O script de dados iniciais localiza-se em: ```src/main/resources/db/migration/V2__seed_data.sql```
 
 ⚙️ Configuração de Ambiente
@@ -45,7 +43,7 @@ Utilize o Maven Wrapper para baixar as dependências e compilar o projeto:
 A aplicação estará disponível em http://localhost:8080.
 
 📍 Endpoints Úteis
-Swagger UI (Documentação): http://localhost:8080/swagger-ui.html
+Swagger UI (Documentação): [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
 API Docs (JSON): http://localhost:8080/v3/api-docs
 
